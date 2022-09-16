@@ -141,7 +141,66 @@ fun timeNotInFormat(timeValue: String, postfix: String): Triple<Boolean, Boolean
  * В случае обнаружения неверного формата файла бросить любое исключение.
  */
 fun sortAddresses(inputName: String, outputName: String) {
-    TODO()
+    val fileWithAddresses = File(inputName)
+    if (fileWithAddresses.notExists())
+        return
+
+    sortAddressesByKirill(fileWithAddresses, outputName)
+}
+
+fun sortAddressesByAnastasiya(addresses: File, outputName: String) {
+    val addresses = addresses.bufferedReader().readLines()
+    val sortedByAddresses = addresses.sortedBy { it.split('-')[1] }
+    val uniqueAddresses = mutableListOf<String>()
+
+    for (i in 0 until sortedByAddresses.size - 1) {
+        val currentAddress = sortedByAddresses[i].split('-')
+        val nextAddress = sortedByAddresses[i + 1].split('-')
+        if (currentAddress[1] == nextAddress[1])
+            TODO()
+    }
+}
+
+fun sortAddressesByKirill(addresses: File, outputName: String) {
+    val answer = mutableMapOf<String, MutableList<String>>()
+//    val answer = mutableMapOf<String, List<SortedSet<String>>>()
+    addresses.bufferedReader().forEachLine {
+        answer.add(it)
+    }
+
+    answer.forEach {
+        it.value.sort()
+    }
+
+    File(outputName).bufferedWriter().use {
+        val sortedAddresses = answer.keys.sortedWith(
+            compareBy(
+                { it.split(' ')[0] },
+                { it.split(' ')[1].toInt() }
+            )
+        )
+
+        for (address in sortedAddresses) {
+            val fullNames = answer[address]!!
+
+            it.write(address.plus(" - "))
+
+            if (fullNames.size != 1)
+                for (indexOfFullName in 0 until fullNames.size - 1)
+                    it.write(fullNames[indexOfFullName].plus(", "))
+
+            it.write(fullNames.last())
+            it.write("\n")
+        }
+    }
+}
+
+fun MutableMap<String, MutableList<String>>.add(innerValue: String) {
+    val (fullName, address) = innerValue.split(" - ")
+    if (this.contains(address))
+        this[address]!!.add(fullName)
+    else
+        this[address] = mutableListOf(fullName)
 }
 
 /**

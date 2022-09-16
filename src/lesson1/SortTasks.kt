@@ -52,14 +52,15 @@ fun sortTimes(inputName: String, outputName: String) {
             return@forEachLine
 
         val (value, postfix) = time
-        if (timeNotInFormat(value, postfix))
+        val (notInFormat, isBeforeMidday, isTwelve) = timeNotInFormat(value, postfix)
+        if (notInFormat)
             return@forEachLine
 
-        if (postfix == "AM")
-            if ("12" in value.substring(0, 2)) midAmTimes.add(it)
+        if (isBeforeMidday)
+            if (isTwelve) midAmTimes.add(it)
             else amTimes.add(it)
         else
-            if ("12" in value.substring(0, 2)) midPmTimes.add(it)
+            if (isTwelve) midPmTimes.add(it)
             else pmTimes.add(it)
     }
 
@@ -67,6 +68,7 @@ fun sortTimes(inputName: String, outputName: String) {
     amTimes.sort()
     midPmTimes.sort()
     pmTimes.sort()
+
     midAmTimes += amTimes + midPmTimes + pmTimes
 
     File(outputName).bufferedWriter().use {
@@ -76,25 +78,37 @@ fun sortTimes(inputName: String, outputName: String) {
     }
 }
 
-fun timeNotInFormat(timeValue: String, postfix: String): Boolean {
-    if (postfix !in listOf("AM", "PM"))
-        return true
+fun timeNotInFormat(timeValue: String, postfix: String): Triple<Boolean, Boolean, Boolean> {
+    var isTwelve = false
+    var isBeforeMidday = false
+
+    val default = Triple(true, isBeforeMidday, isTwelve)
+
+    if (postfix == "AM")
+        isBeforeMidday = true
+    else if (postfix != "PM")
+        return default
 
     val timeValues = timeValue.split(':')
     if (timeValues.size != 3)
-        return true
+        return default
 
     val (hours, minutes, seconds) = timeValues
     if (hours.length != 2 || minutes.length != 2 || seconds.length != 2)
-        return true
+        return default
 
-    val isHours = hours.toInt() in 0..12
+    var isHours = true
+    hours.toInt().also {
+        if (it == 12) isTwelve = true
+        else if (it !in 0 ..11) isHours = false
+    }
+
     val isMinutes = minutes.toInt() in 0..60
     val isSeconds = seconds.toInt() in 0..60
     if (isHours && isMinutes && isSeconds)
-        return false
+        return Triple(false, isBeforeMidday, isTwelve)
 
-    return true
+    return default
 }
 
 /**

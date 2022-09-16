@@ -2,6 +2,8 @@
 
 package lesson1
 
+import java.io.File
+
 /**
  * Сортировка времён
  *
@@ -31,9 +33,68 @@ package lesson1
  * 07:56:14 PM
  *
  * В случае обнаружения неверного формата файла бросить любое исключение.
+ *
+ * Время работы - O(2n^2), размер требуемой памяти - O(3*n)
  */
 fun sortTimes(inputName: String, outputName: String) {
-    TODO()
+    val fileWithTimes = File(inputName)
+    if (!fileWithTimes.exists())
+        return
+
+    val midAmTimes = mutableListOf<String>()
+    val amTimes = mutableListOf<String>()
+    val midPmTimes = mutableListOf<String>()
+    val pmTimes = mutableListOf<String>()
+
+    fileWithTimes.forEachLine {
+        val time = it.split(' ')
+        if (time.size != 2)
+            return@forEachLine
+
+        val (value, postfix) = time
+        if (timeNotInFormat(value, postfix))
+            return@forEachLine
+
+        if (postfix == "AM")
+            if ("12" in value.substring(0, 2)) midAmTimes.add(it)
+            else amTimes.add(it)
+        else
+            if ("12" in value.substring(0, 2)) midPmTimes.add(it)
+            else pmTimes.add(it)
+    }
+
+    midAmTimes.sort()
+    amTimes.sort()
+    midPmTimes.sort()
+    pmTimes.sort()
+    midAmTimes += amTimes + midPmTimes + pmTimes
+
+    File(outputName).bufferedWriter().use {
+        for (times in midAmTimes) {
+            it.write(times.plus("\n"))
+        }
+    }
+}
+
+fun timeNotInFormat(timeValue: String, postfix: String): Boolean {
+    if (postfix !in listOf("AM", "PM"))
+        return true
+
+    val timeValues = timeValue.split(':')
+    if (timeValues.size != 3)
+        return true
+
+    val (hours, minutes, seconds) = timeValues
+    if (hours.length != 2 || minutes.length != 2 || seconds.length != 2)
+        return true
+
+    val hoursWrong = hours.toInt() !in 0..12
+    val minutesWrong = minutes.toInt() !in 0..60
+    val secondsWrong = seconds.toInt() !in 0..60
+    if (hoursWrong || minutesWrong || secondsWrong)
+        return true
+
+    return false
 }
 
 /**

@@ -4,6 +4,11 @@ import java.util.*
 
 private val random = Random(Calendar.getInstance().timeInMillis)
 
+/**
+ * Time complexity: Average - O(n^2)
+ * Memory usage: O(1)
+ * (which is spent at execution time (over initial data))
+ */
 fun <T : Comparable<T>> insertionSort(elements: MutableList<T>) {
     for (i in 1 until elements.size) {
         val current = elements[i]
@@ -41,6 +46,10 @@ private fun mergeSort(elements: IntArray, begin: Int, end: Int) {
     merge(elements, begin, middle, end)
 }
 
+/**
+ * Time complexity: Worst - O(n*log(n))
+ * Memory usage: O(n)
+ */
 fun mergeSort(elements: IntArray) {
     mergeSort(elements, 0, elements.size)
 }
@@ -132,6 +141,10 @@ fun countingSort(elements: IntArray, limit: Int): IntArray {
 /**
  * Библиотечные сортировки (приведены только для примера,
  * рекомендуется использовать list.sorted() и list.sort() напрямую)
+ *
+ * Time complexity: Worst - O(n^2)
+ *                  Avg - O(nlog(n))
+ * Memory usage: O(1)
  */
 fun <T : Comparable<T>> librarySortForImmutable(list: List<T>): List<T> = list.sorted()
 

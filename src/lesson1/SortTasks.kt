@@ -88,13 +88,13 @@ fun timeNotInFormat(timeValue: String, postfix: String): Boolean {
     if (hours.length != 2 || minutes.length != 2 || seconds.length != 2)
         return true
 
-    val hoursWrong = hours.toInt() !in 0..12
-    val minutesWrong = minutes.toInt() !in 0..60
-    val secondsWrong = seconds.toInt() !in 0..60
-    if (hoursWrong || minutesWrong || secondsWrong)
-        return true
+    val isHours = hours.toInt() in 0..12
+    val isMinutes = minutes.toInt() in 0..60
+    val isSeconds = seconds.toInt() in 0..60
+    if (isHours && isMinutes && isSeconds)
+        return false
 
-    return false
+    return true
 }
 
 /**

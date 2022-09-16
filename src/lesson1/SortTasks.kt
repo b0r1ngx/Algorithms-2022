@@ -3,6 +3,7 @@
 package lesson1
 
 import java.io.File
+import java.lang.Exception
 
 /**
  * Сортировка времён
@@ -38,7 +39,7 @@ import java.io.File
  */
 fun sortTimes(inputName: String, outputName: String) {
     val fileWithTimes = File(inputName)
-    if (!fileWithTimes.exists())
+    if (fileWithTimes.notExists())
         return
 
     val midAmTimes = mutableListOf<String>()
@@ -49,12 +50,12 @@ fun sortTimes(inputName: String, outputName: String) {
     fileWithTimes.forEachLine {
         val time = it.split(' ')
         if (time.size != 2)
-            return@forEachLine
+            throw Exception("WrongFormatException")
 
-        val (value, postfix) = time
-        val (notInFormat, isBeforeMidday, isTwelve) = timeNotInFormat(value, postfix)
+        val (timeValue, postfix) = time
+        val (notInFormat, isBeforeMidday, isTwelve) = timeNotInFormat(timeValue, postfix)
         if (notInFormat)
-            return@forEachLine
+            throw Exception("WrongFormatException")
 
         if (isBeforeMidday)
             if (isTwelve) midAmTimes.add(it)
@@ -78,6 +79,8 @@ fun sortTimes(inputName: String, outputName: String) {
     }
 }
 
+fun File.notExists() = !this.exists()
+
 fun timeNotInFormat(timeValue: String, postfix: String): Triple<Boolean, Boolean, Boolean> {
     var isTwelve = false
     var isBeforeMidday = false
@@ -100,7 +103,7 @@ fun timeNotInFormat(timeValue: String, postfix: String): Triple<Boolean, Boolean
     var isHours = true
     hours.toInt().also {
         if (it == 12) isTwelve = true
-        else if (it !in 0 ..11) isHours = false
+        else if (it !in 0..11) isHours = false
     }
 
     val isMinutes = minutes.toInt() in 0..60
